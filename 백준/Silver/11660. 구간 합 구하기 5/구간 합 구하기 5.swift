@@ -55,13 +55,11 @@ final class FileIO {
 let fileIO = FileIO()
 let length = fileIO.readInt()
 let testCase = fileIO.readInt()
-var array = Array(repeating: Array(repeating: 0, count: length + 1), count: length)
-for row in 0 ..< length {
-    var sum = 0
+var array = Array(repeating: Array(repeating: 0, count: length + 1), count: length + 1)
+for row in 1 ... length {
     for column in 1 ... length {
         let input = fileIO.readInt()
-        sum += input
-        array[row][column] = sum
+        array[row][column] = array[row - 1][column] + array[row][column - 1] - array[row - 1][column - 1] + input
     }
 }
 
@@ -69,14 +67,10 @@ for row in 0 ..< length {
 
 var answer = ""
 for _ in 0 ..< testCase {
-    let firstX = fileIO.readInt() - 1
-    let firstY = fileIO.readInt() - 1
-    let secondX = fileIO.readInt() - 1
+    let firstX = fileIO.readInt()
+    let firstY = fileIO.readInt()
+    let secondX = fileIO.readInt()
     let secondY = fileIO.readInt()
-    var sum = 0
-    for row in firstX ... secondX {
-        sum += (array[row][secondY] - array[row][firstY])
-    }
-    answer += "\(sum)\n"
+    answer += "\(array[secondX][secondY] - array[firstX - 1][secondY] - array[secondX][firstY - 1] + array[firstX - 1][firstY - 1])\n"
 }
 print(answer)
