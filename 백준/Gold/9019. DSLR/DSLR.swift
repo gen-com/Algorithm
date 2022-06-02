@@ -51,12 +51,10 @@ final class FileIO {
 }
 
 // MARK: - Input
-
 let fileIO = FileIO()
 let testCase = fileIO.readInt()
 
 // MARK: - Solution
-
 enum Command: String {
     
     case d = "D"
@@ -75,44 +73,47 @@ for _ in 0 ..< testCase {
     var visited = Array(repeating: false, count: 10000)
     var currentIndex = 0
     visited[current] = true
+    var found = false
     while currentIndex < queue.count {
         let front = queue[currentIndex]
-        if front.current == destination {
-            answer += "\(front.command)\n"
-            break
-        } else {
-            for command in Command.all {
-                switch command {
-                case .d:
-                    let next = front.current * 2 % 10000
-                    if visited[next] == false {
-                        queue.append((next, front.command + command.rawValue))
-                        visited[next] = true
-                    }
-                case .s:
-                    if front.current == 0, visited[9999] == false {
-                        queue.append((9999, front.command + command.rawValue))
-                        visited[9999] = true
-                    } else if 0 <= front.current - 1, visited[front.current - 1] == false {
-                        queue.append((front.current - 1, front.command + command.rawValue))
-                        visited[front.current - 1] = true
-                    }
-                case .l:
-                    let next = front.current % 1000 * 10 + front.current / 1000
-                    if visited[next] == false {
-                        queue.append((next, front.command + command.rawValue))
-                        visited[next] = true
-                    }
-                case .r:
-                    let next = front.current % 10 * 1000 + front.current / 10
-                    if visited[next] == false {
-                        queue.append((next, front.command + command.rawValue))
-                        visited[next] = true
-                    }
+        for command in Command.all {
+            switch command {
+            case .d:
+                let next = front.current * 2 % 10000
+                if next == destination { answer += "\(front.command + command.rawValue)\n"; found = true; break }
+                if visited[next] == false {
+                    queue.append((next, front.command + command.rawValue))
+                    visited[next] = true
+                }
+            case .s:
+                if front.current == 0, visited[9999] == false {
+                    if 9999 == destination { answer += "\(front.command + command.rawValue)\n"; found = true; break }
+                    queue.append((9999, front.command + command.rawValue))
+                    visited[9999] = true
+                } else if 0 <= front.current - 1, visited[front.current - 1] == false {
+                    if front.current - 1 == destination { answer += "\(front.command + command.rawValue)\n"; found = true; break }
+                    queue.append((front.current - 1, front.command + command.rawValue))
+                    visited[front.current - 1] = true
+                }
+            case .l:
+                let next = front.current % 1000 * 10 + front.current / 1000
+                if next == destination { answer += "\(front.command + command.rawValue)\n"; found = true; break }
+                if visited[next] == false {
+                    queue.append((next, front.command + command.rawValue))
+                    visited[next] = true
+                }
+            case .r:
+                let next = front.current % 10 * 1000 + front.current / 10
+                if next == destination { answer += "\(front.command + command.rawValue)\n"; found = true; break }
+                if visited[next] == false {
+                    queue.append((next, front.command + command.rawValue))
+                    visited[next] = true
                 }
             }
-            currentIndex += 1
+            if found { break }
         }
+        if found { break }
+        currentIndex += 1
     }
 }
 print(answer)
