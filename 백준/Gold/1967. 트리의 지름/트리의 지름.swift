@@ -78,33 +78,29 @@ for _ in 0 ..< numberOfNodes - 1 {
 
 // MARK: - Solution
 
-func solution() -> Int {
-    var answer = 0
-    var farthestNode = 0
-    var notVisited = Array(repeating: true, count: numberOfNodes + 1)
-    
-    func dfs(_ currentNode: Int, _ dist: Int) {
-        if answer < dist {
-            farthestNode = currentNode
-            answer = dist
-        }
-        if let edges = edgesFor[currentNode] {
-            for edge in edges {
-                if notVisited[edge.destination] {
-                    notVisited[edge.destination] = false
-                    dfs(edge.destination, dist + edge.distance)
-                }
+var answer = 0
+var farthestNode = 0
+var notVisited = Array(repeating: true, count: numberOfNodes + 1)
+
+func dfs(_ currentNode: Int, _ dist: Int) {
+    if answer < dist {
+        farthestNode = currentNode
+        answer = dist
+    }
+    if let edges = edgesFor[currentNode] {
+        for edge in edges {
+            if notVisited[edge.destination] {
+                notVisited[edge.destination] = false
+                dfs(edge.destination, dist + edge.distance)
             }
         }
     }
-    
-    notVisited[1] = false
-    dfs(1, 0)
-    notVisited = Array(repeating: true, count: numberOfNodes + 1)
-    notVisited[farthestNode] = false
-    answer = 0
-    dfs(farthestNode, 0)
-    
-    return answer
 }
-print(solution())
+
+notVisited[1] = false
+dfs(1, 0)
+notVisited = Array(repeating: true, count: numberOfNodes + 1)
+notVisited[farthestNode] = false
+answer = 0
+dfs(farthestNode, 0)
+print(answer)
