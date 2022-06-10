@@ -57,6 +57,7 @@ typealias Position = (row: Int, column: Int)
 let fileIO = FileIO()
 let mapWidth = fileIO.readInt()
 var map = Array(repeating: Array(repeating: 0, count: mapWidth), count: mapWidth)
+var dpMap = Array(repeating: Array(repeating: Array(repeating: 0, count: PipeMove.all.count), count: mapWidth), count: mapWidth)
 for row in 0 ..< mapWidth {
     for column in 0 ..< mapWidth {
         map[row][column] = fileIO.readInt()
@@ -65,7 +66,7 @@ for row in 0 ..< mapWidth {
 
 // MARK: - Solution
 
-enum PipeMove {
+enum PipeMove: Int {
     
     case moveHorizontally
     case moveVertically
@@ -85,31 +86,25 @@ enum PipeMove {
     static let all = [PipeMove.moveHorizontally, .moveVertically, .moveDiagonally]
 }
 
-let destination: Position = (mapWidth - 1, mapWidth - 1)
 var answer = 0
+let destination: Position = (mapWidth - 1, mapWidth - 1)
+dpMap[0][1][0] = 1
 
-func backTracking(current: Position, lastMove: PipeMove) {
-    if current == destination {
-        answer += 1
-    } else {
-        for move in PipeMove.all {
-            if move == .moveHorizontally, lastMove == .moveVertically { continue }
-            if move == .moveVertically, lastMove == .moveHorizontally { continue }
-            let next = PipeMove.nextPosition(from: current, move)
-            if 0 <= next.row, next.row < mapWidth, 0 <= next.column, next.column < mapWidth {
-                if map[next.row][next.column] == 0 {
-                    if move == .moveDiagonally {
-                        if map[next.row][current.column] == 0, map[current.row][next.column] == 0 {
-                            backTracking(current: next, lastMove: move)
-                        }
-                    } else {
-                        backTracking(current: next, lastMove: move)
-                    }
+for i in 0 ..< mapWidth {
+    for j in 2 ..< mapWidth {
+        if map[i][j] == 0 {
+            dpMap[i][j][0] = dpMap[i][j - 1][0] + dpMap[i][j - 1][2]
+            if 0 < i {
+                dpMap[i][j][1] = dpMap[i - 1][j][1] + dpMap[i - 1][j][2]
+                if map[i - 1][j] == 0, map[i][j - 1] == 0 {
+                    dpMap[i][j][2] = dpMap[i - 1][j - 1][0] + dpMap[i - 1][j - 1][1] + dpMap[i - 1][j - 1][2]
                 }
             }
         }
     }
 }
 
-backTracking(current: (0, 1), lastMove: .moveHorizontally)
+for move in 0 ..< PipeMove.all.count {
+    answer += dpMap[destination.row][destination.column][move]
+}
 print(answer)
