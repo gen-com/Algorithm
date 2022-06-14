@@ -62,7 +62,7 @@ typealias PositionInformation = (position: Int, time: Int)
 
 var answer = [Int.max, 0]
 var queue: [PositionInformation] = [(startingPoint, 0)]
-var distanceArray = Array(repeating: Int.max, count: 200_001)
+var distanceArray = Array(repeating: Int.max, count: 100_001)
 var currentIndex = 0
 distanceArray[startingPoint] = 0
 
@@ -77,11 +77,11 @@ while currentIndex < queue.endIndex {
         distanceArray[front.position - 1] = front.time + 1
         queue.append((front.position - 1, front.time + 1))
     }
-    if front.position + 1 < 200_001, front.time + 1 <= distanceArray[front.position + 1] {
+    if front.position + 1 < 100_001, front.time + 1 <= distanceArray[front.position + 1] {
         distanceArray[front.position + 1] = front.time + 1
         queue.append((front.position + 1, front.time + 1))
     }
-    if front.position * 2 < 200_001, front.time + 1 <= distanceArray[front.position * 2] {
+    if front.position * 2 < 100_001, front.time + 1 <= distanceArray[front.position * 2] {
         distanceArray[front.position * 2] = front.time + 1
         queue.append((front.position * 2, front.time + 1))
     }
