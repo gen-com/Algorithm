@@ -59,11 +59,13 @@ let numberOfTown = fileIO.readInt()
 let numberOfEdge = fileIO.readInt()
 let partyTown = fileIO.readInt()
 var edgeFor = Array(repeating: [EdgeInformation](), count: numberOfTown + 1)
+var reverseEdgeFor = Array(repeating: [EdgeInformation](), count: numberOfTown + 1)
 for _ in 0 ..< numberOfEdge {
     let startingPoint = fileIO.readInt()
     let destination = fileIO.readInt()
     let distance = fileIO.readInt()
     edgeFor[startingPoint].append((destination, distance))
+    reverseEdgeFor[destination].append((startingPoint, distance))
 }
 
 // MARK: - Solution
@@ -145,11 +147,12 @@ struct Heap<Element> {
     }
 }
 
-private func dijkstraShortestPathSearch(startingPoint: Int, destination: Int) -> Int {
+var distanceArray = Array(repeating: Int.max, count: numberOfTown + 1)
+
+private func dijkstraShortestPathSearch(partyTown: Int) {
     var heap = Heap<EdgeInformation> { $0.distance < $1.distance }
-    var distanceArray = Array(repeating: Int.max, count: numberOfTown + 1)
-    heap.insert((startingPoint, 0))
-    distanceArray[startingPoint] = 0
+    heap.insert((partyTown, 0))
+    distanceArray[partyTown] = 0
     while heap.isEmpty == false {
         if let front = heap.popFront() {
             if front.distance <= distanceArray[front.town] {
@@ -162,17 +165,32 @@ private func dijkstraShortestPathSearch(startingPoint: Int, destination: Int) ->
             }
         }
     }
-    
-    return distanceArray[destination]
+}
+
+var reverseDistanceArray = Array(repeating: Int.max, count: numberOfTown + 1)
+
+private func reverseDijkstraShortestPathSearch(partyTown: Int) {
+    var heap = Heap<EdgeInformation> { $0.distance < $1.distance }
+    heap.insert((partyTown, 0))
+    reverseDistanceArray[partyTown] = 0
+    while heap.isEmpty == false {
+        if let front = heap.popFront() {
+            if front.distance <= reverseDistanceArray[front.town] {
+                for next in reverseEdgeFor[front.town] {
+                    if reverseDistanceArray[front.town] + next.distance < reverseDistanceArray[next.town] {
+                        reverseDistanceArray[next.town] = reverseDistanceArray[front.town] + next.distance
+                        heap.insert((next.town, reverseDistanceArray[next.town]))
+                    }
+                }
+            }
+        }
+    }
 }
 
 var answer = 0
+dijkstraShortestPathSearch(partyTown: partyTown)
+reverseDijkstraShortestPathSearch(partyTown: partyTown)
 for town in 1 ... numberOfTown {
-    if town != partyTown {
-        answer = max(
-            answer,
-            dijkstraShortestPathSearch(startingPoint: town, destination: partyTown) + dijkstraShortestPathSearch(startingPoint: partyTown, destination: town)
-        )
-    }
+    answer = max(answer, distanceArray[town] + reverseDistanceArray[town])
 }
 print(answer)
