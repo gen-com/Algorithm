@@ -57,23 +57,29 @@ let targetNumber = fileIO.readInt()
 
 // MARK: - Solution
 
-var dp = Array(repeating: 0, count: targetNumber + 1)
-
 func solution(_ number: Int) -> Int {
-    if number < 2 {
-        dp[number] = 0
-    } else {
-        for num in 2 ... number {
-            dp[num] = dp[num - 1] + 1
-            if num % 2 == 0 {
-                dp[num] = min(dp[num], dp[num / 2] + 1)
-            }
-            if num % 3 == 0 {
-                dp[num] = min(dp[num], dp[num / 3] + 1)
-            }
+    var visited = Array(repeating: Int.max, count: targetNumber + 1)
+    var queue = [(number: number, steps: 0)]
+    var currentIndex = 0
+    visited[number] = 0
+    while currentIndex < queue.endIndex {
+        let front = queue[currentIndex]
+        if front.number == 1 { break }
+        if front.number % 3 == 0, front.steps + 1 < visited[front.number / 3] {
+            visited[front.number / 3] = front.steps + 1
+            queue.append((front.number / 3, front.steps + 1))
         }
+        if front.number % 2 == 0, front.steps + 1 < visited[front.number / 2] {
+            visited[front.number / 2] = front.steps + 1
+            queue.append((front.number / 2, front.steps + 1))
+        }
+        if front.steps + 1 < visited[front.number - 1] {
+            visited[front.number - 1] = front.steps + 1
+            queue.append((front.number - 1, front.steps + 1))
+        }
+        currentIndex += 1
     }
     
-    return dp[number]
+    return visited[1]
 }
 print(solution(targetNumber))
