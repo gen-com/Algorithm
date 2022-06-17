@@ -91,12 +91,10 @@ private func find(lhs: Int, rhs: Int) -> Bool {
 }
 
 private func union(lhs: Int, rhs: Int) {
-    let lhsParent = parent(of: lhs)
-    let rhsParent = parent(of: rhs)
-    if lhsParent < rhsParent {
-        parentOf[rhsParent] = lhsParent
+    if lhs < rhs {
+        parentOf[rhs] = lhs
     } else {
-        parentOf[lhsParent] = rhsParent
+        parentOf[lhs] = rhs
     }
 }
 
